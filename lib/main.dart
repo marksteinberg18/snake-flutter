@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snake_flutter/game_painter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,8 +31,12 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
-        child: Text('Snake game goes here'),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: CustomPaint(painter: GamePainter()),
+        ),
       ),
     );
   }
