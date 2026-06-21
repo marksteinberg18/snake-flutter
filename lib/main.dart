@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:snake_flutter/game_painter.dart';
+import 'cell.dart';
+import 'snake.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,12 +32,13 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
+    Snake snake = Snake.initial();
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: AspectRatio(
           aspectRatio: 1,
-          child: CustomPaint(painter: GamePainter()),
+          child: CustomPaint(painter: GamePainter(snake: snake)),
         ),
       ),
     );
