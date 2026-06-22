@@ -12,13 +12,14 @@ class Snake {
     : body = [Cell(10, 10), Cell(9, 10), Cell(8, 10)],
       direction = Direction.right;
 
-  // {
-  //   Cell head = Cell(10, 10);
-  //   Cell body1 = Cell(9, 10);
-  //   Cell body2 = Cell(8, 10);
-  //   List<Cell> body;
-  //   body = [head, body1, body2];
-  //   Direction direction = Direction.right;
-  //   return Snake(body: body, direction: direction);
-  // }
+  Snake move() {
+    Cell newHead = body.first.moveRight();
+    List<Cell> newBody = [];
+    newBody.add(newHead);
+    for (Cell cell in body) {
+      newBody.add(cell);
+    }
+    newBody.removeLast();
+    return Snake(body: newBody, direction: direction);
+  }
 }

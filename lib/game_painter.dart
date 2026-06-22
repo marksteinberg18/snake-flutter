@@ -34,7 +34,10 @@ class GamePainter extends CustomPainter {
       }
     }
     final snakePaint = Paint();
-    snakePaint.color = Colors.greenAccent;
+    snakePaint.color = Colors.green;
+    final headPaint = Paint();
+    headPaint.color = Colors.greenAccent;
+
     for (final cell in snake.body) {
       canvas.drawRect(
         Rect.fromLTWH(
@@ -43,7 +46,7 @@ class GamePainter extends CustomPainter {
           cellWidth,
           cellHeight,
         ),
-        snakePaint,
+        cell == snake.body.first ? headPaint : snakePaint,
       );
     }
   }

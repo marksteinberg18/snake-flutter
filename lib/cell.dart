@@ -23,4 +23,11 @@ class Cell {
   Cell moveDown() {
     return Cell(x, y + 1);
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Cell && other.x == x && other.y == y;
+
+  @override
+  int get hashCode => Object.hash(x, y);
 }

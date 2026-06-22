@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:snake_flutter/game_painter.dart';
 import 'cell.dart';
 import 'snake.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -30,9 +31,28 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  late Timer _timer;
+  Snake snake = Snake.initial();
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      print(snake.body);
+      print(snake.direction);
+      setState(() {
+        snake = snake.move();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Snake snake = Snake.initial();
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
