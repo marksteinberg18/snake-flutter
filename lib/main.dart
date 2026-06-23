@@ -37,11 +37,16 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      print(snake.body);
-      print(snake.direction);
+      //print(snake.body);
+      //print(snake.direction);
       setState(() {
         snake = snake.move();
+        print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
       });
+      // if (snake.body.first.x == 19) {
+      //   _timer.cancel();
+      //   super.dispose();
+      // }
     });
   }
 

@@ -8,12 +8,12 @@ class Cell {
     print('Cell at $x,$y');
   }
 
-  Cell moveRight() {
-    return Cell(x + 1, y);
-  }
+  Cell moveRight() => Cell((x + 1) % 20, y); //wraps one side to the next
 
   Cell moveLeft() {
-    return Cell(x - 1, y);
+    x - 1;
+    if (x == 0) x = 20;
+    return Cell(x, y);
   }
 
   Cell moveUp() {

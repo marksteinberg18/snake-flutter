@@ -13,7 +13,14 @@ class Snake {
       direction = Direction.right;
 
   Snake move() {
-    Cell newHead = body.first.moveRight();
+    Cell newHead = switch (direction) {
+      Direction.up => body.first.moveUp(),
+      Direction.right => body.first.moveRight(),
+      Direction.down => body.first.moveDown(),
+      Direction.left => body.first.moveLeft(),
+    };
+
+    //Cell newHead = body.first;
     List<Cell> newBody = [];
     newBody.add(newHead);
     for (Cell cell in body) {
