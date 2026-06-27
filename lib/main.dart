@@ -3,6 +3,7 @@ import 'package:snake_flutter/game_painter.dart';
 import 'cell.dart';
 import 'snake.dart';
 import 'dart:async';
+import 'package:snake_flutter/gesture_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: const GameScreen(),
+      home: GameScreen(), //const GameScreen(),
     );
   }
 }
@@ -36,17 +37,13 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 750), (timer) {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
         snake = snake.move();
         print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
       });
-      // if (snake.body.first.x == 19) {
-      //   _timer.cancel();
-      //   super.dispose();
-      // }
     });
   }
 
@@ -61,11 +58,40 @@ class _GameScreenState extends State<GameScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: AspectRatio(
-          aspectRatio: 1,
-          child: CustomPaint(painter: GamePainter(snake: snake)),
+        child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            print(details);
+            if (details.velocity.pixelsPerSecond.dy < 0) {
+              ChangeDirection(Direction.up);
+              print('swipe up');
+            } else {
+              ChangeDirection(Direction.down);
+              print('swipe down');
+            }
+          },
+          onHorizontalDragEnd: (details) {
+            print('Horizontal: $details');
+            if (details.velocity.pixelsPerSecond.dx > 0) {
+              ChangeDirection(Direction.right);
+
+              print('swipe right');
+            } else {
+              ChangeDirection(Direction.left);
+              print('swipe left');
+            }
+          },
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: CustomPaint(painter: GamePainter(snake: snake)),
+          ),
         ),
       ),
     );
+  }
+
+  void ChangeDirection(Direction newDir) {
+    setState(() {
+      snake = snake.changeDirection(newDir);
+    });
   }
 }
