@@ -4,6 +4,8 @@ import 'cell.dart';
 import 'snake.dart';
 import 'dart:async';
 import 'package:snake_flutter/gesture_screen.dart';
+import 'game_state.dart';
+import 'food.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +35,9 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
-  Snake snake = Snake.initial();
+  GameState gameState = GameState.initial();
+
+  //Snake snake = Snake.initial();
   @override
   void initState() {
     super.initState();
@@ -41,8 +45,9 @@ class _GameScreenState extends State<GameScreen> {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
-        snake = snake.move();
-        print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
+        gameState = gameState.tick();
+        //snake = snake.move();
+        //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
       });
     });
   }
@@ -62,36 +67,42 @@ class _GameScreenState extends State<GameScreen> {
           onVerticalDragEnd: (details) {
             print(details);
             if (details.velocity.pixelsPerSecond.dy < 0) {
-              ChangeDirection(Direction.up);
+              changeDirection(Direction.up);
               print('swipe up');
             } else {
-              ChangeDirection(Direction.down);
+              changeDirection(Direction.down);
               print('swipe down');
             }
           },
           onHorizontalDragEnd: (details) {
             print('Horizontal: $details');
             if (details.velocity.pixelsPerSecond.dx > 0) {
-              ChangeDirection(Direction.right);
+              changeDirection(Direction.right);
 
               print('swipe right');
             } else {
-              ChangeDirection(Direction.left);
+              changeDirection(Direction.left);
               print('swipe left');
             }
           },
           child: AspectRatio(
             aspectRatio: 1,
-            child: CustomPaint(painter: GamePainter(snake: snake)),
+            child: CustomPaint(painter: GamePainter(snake: gameState.snake)),
           ),
         ),
       ),
     );
   }
 
-  void ChangeDirection(Direction newDir) {
+  void changeDirection(Direction newDir) {
     setState(() {
-      snake = snake.changeDirection(newDir);
+      gameState = gameState.changeDirection(newDir);
+      //snake = snake.changeDirection(newDir);
     });
   }
 }
+
+//TODO create a simple text box to show x,y of snake head
+//TODO create a simple text box to show x,y of food
+//TODO game over if snake head touches body
+//TODO in game_painter.dart add food alongside snake to draw rectangle
