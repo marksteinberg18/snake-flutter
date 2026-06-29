@@ -21,7 +21,8 @@ class GameState {
   GameState tick() {
     final Snake movedSnake = snake.move();
     if (movedSnake.body.first == food.foodCell) {
-      final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
+      //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
+      eatenFoodLocations.add(food.foodCell);
       final Snake grownSnake = Snake(
         body: [...movedSnake.body, snake.body.last],
         direction: movedSnake.direction,
@@ -32,6 +33,6 @@ class GameState {
   }
 
   GameState changeDirection(Direction dir) {
-    return GameState(snake, food, eatenFoodLocations);
+    return GameState(snake.changeDirection(dir), food, eatenFoodLocations);
   }
 }
