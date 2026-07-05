@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:snake_flutter/gesture_screen.dart';
 import 'game_state.dart';
 import 'food.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,17 +36,27 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
+
   GameState gameState = GameState.initial();
 
   //Snake snake = Snake.initial();
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 750), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
+        final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
+        final int newEatenCount = gameState.eatenFoodLocations.length;
+        print('Age of food: ${gameState.ageOfFood()}');
+
+        if (newEatenCount > oldEatenCount) {
+          //snake has eaten some food!
+          print('eaten!!');
+          HapticFeedback.vibrate();
+        }
         //snake = snake.move();
         //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
       });
@@ -87,7 +98,12 @@ class _GameScreenState extends State<GameScreen> {
           },
           child: AspectRatio(
             aspectRatio: 1,
-            child: CustomPaint(painter: GamePainter(snake: gameState.snake)),
+            child: CustomPaint(
+              painter: GamePainter(
+                snake: gameState.snake,
+                food: gameState.foodCell,
+              ),
+            ),
           ),
         ),
       ),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'snake.dart';
+import 'food.dart';
 
 class GamePainter extends CustomPainter {
   final Snake snake;
-  GamePainter({required this.snake});
+  final Food food;
+  GamePainter({required this.snake, required this.food});
 
   @override
   void paint(Canvas canvas, Size size) {
+    //print('Foodcell: ${food.cellFood.x},${food.cellFood.y}');
     final bgPaint = Paint();
     bgPaint.color = Colors.black;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
@@ -49,6 +52,24 @@ class GamePainter extends CustomPainter {
         cell == snake.body.first ? headPaint : snakePaint,
       );
     }
+    //to print food red rectangle here....
+    double alpha = (Food.maxAge - food.age) / (Food.maxAge - 1);
+    final foodPaint = Paint();
+    foodPaint.color = Colors.red.withValues(alpha: alpha);
+    final int foodX = food.cellFood.x;
+    final int foodY = food.cellFood.y;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(
+          foodX * cellWidth + 1,
+          foodY * cellHeight + 1,
+          cellWidth,
+          cellHeight,
+        ),
+        Radius.circular(4),
+      ),
+      foodPaint,
+    );
   }
 
   @override
