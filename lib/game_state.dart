@@ -7,6 +7,7 @@ class GameState {
   final Food foodCell;
   final List<Cell> eatenFoodLocations;
   int ticksSinceMove;
+  static const moveInterval = 0.2; //7 x 100ms = 700ms
 
   GameState(
     this.snake,
@@ -27,20 +28,25 @@ class GameState {
 
   GameState tick() {
     ticksSinceMove++;
-    final Snake movedSnake = snake.move();
-    if (movedSnake.body.first == foodCell.cellFood) {
-      //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
-      eatenFoodLocations.add(foodCell.cellFood);
-      final Snake grownSnake = Snake(
-        body: [...movedSnake.body, snake.body.last],
-        direction: movedSnake.direction,
-      );
-      return GameState(
-        grownSnake,
-        Food.spawn(grownSnake),
-        eatenFoodLocations,
-        ticksSinceMove,
-      );
+    Snake movedSnake = snake;
+    if (ticksSinceMove == 2) {
+      //time for move
+      ticksSinceMove = 0;
+      movedSnake = snake.move();
+      if (movedSnake.body.first == foodCell.cellFood) {
+        //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
+        eatenFoodLocations.add(foodCell.cellFood);
+        final Snake grownSnake = Snake(
+          body: [...movedSnake.body, snake.body.last],
+          direction: movedSnake.direction,
+        );
+        return GameState(
+          grownSnake,
+          Food.spawn(grownSnake),
+          eatenFoodLocations,
+          ticksSinceMove,
+        );
+      }
     }
     //age food - non eaten branch, called at each tick
     Food agedFood =

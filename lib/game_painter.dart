@@ -53,7 +53,10 @@ class GamePainter extends CustomPainter {
       );
     }
     //to print food red rectangle here....
-    double alpha = (Food.maxAge - food.age) / (Food.maxAge - 1);
+    double alpha = ((Food.maxAge - food.age) / (Food.maxAge - 1)).clamp(
+      0.0,
+      1.0,
+    );
     final foodPaint = Paint();
     foodPaint.color = Colors.red.withValues(alpha: alpha);
     final int foodX = food.cellFood.x;

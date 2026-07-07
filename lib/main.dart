@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:snake_flutter/game_painter.dart';
 import 'cell.dart';
@@ -36,6 +37,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
+  late AudioPlayer _audioPlayer;
 
   GameState gameState = GameState.initial();
 
@@ -43,6 +45,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
+    _audioPlayer = AudioPlayer();
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       //print(snake.body);
       //print(snake.direction);
@@ -56,6 +59,7 @@ class _GameScreenState extends State<GameScreen> {
           //snake has eaten some food!
           print('eaten!!');
           HapticFeedback.vibrate();
+          _audioPlayer.play(AssetSource('sounds/success.wav'));
         }
         //snake = snake.move();
         //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
@@ -66,6 +70,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _timer.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
