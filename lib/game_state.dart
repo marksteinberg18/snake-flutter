@@ -29,7 +29,7 @@ class GameState {
   GameState tick() {
     ticksSinceMove++;
     Snake movedSnake = snake;
-    if (ticksSinceMove == 2) {
+    if (ticksSinceMove == 3) {
       //time for move
       ticksSinceMove = 0;
       movedSnake = snake.move();

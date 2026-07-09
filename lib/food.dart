@@ -5,7 +5,7 @@ import 'snake.dart';
 class Food {
   final Cell cellFood;
   final int age;
-  static const int maxAge = 70; //50 * 100ms = 5s until fully faded
+  static const int maxAge = 100; //100 * 100ms = 10s until fully faded
 
   Food(this.cellFood, this.age);
 

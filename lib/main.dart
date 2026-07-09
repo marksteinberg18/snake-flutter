@@ -59,6 +59,7 @@ class _GameScreenState extends State<GameScreen> {
           //snake has eaten some food!
           print('eaten!!');
           HapticFeedback.vibrate();
+
           _audioPlayer.play(AssetSource('sounds/success.wav'));
         }
         //snake = snake.move();
