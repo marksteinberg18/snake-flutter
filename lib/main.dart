@@ -1,13 +1,12 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:snake_flutter/game_painter.dart';
 import 'cell.dart';
 import 'snake.dart';
 import 'dart:async';
-import 'package:snake_flutter/gesture_screen.dart';
 import 'game_state.dart';
 import 'food.dart';
 import 'package:flutter/services.dart';
+import 'sound_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,7 +36,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
-  late AudioPlayer _audioPlayer;
+  late SoundManager _soundManager;
 
   GameState gameState = GameState.initial();
 
@@ -45,7 +44,9 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
+    _soundManager = SoundManager();
+    _soundManager.init();
+
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       //print(snake.body);
       //print(snake.direction);
@@ -53,14 +54,14 @@ class _GameScreenState extends State<GameScreen> {
         final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
         final int newEatenCount = gameState.eatenFoodLocations.length;
-        print('Age of food: ${gameState.ageOfFood()}');
+        //print('Age of food: ${gameState.ageOfFood()}');
 
         if (newEatenCount > oldEatenCount) {
           //snake has eaten some food!
           print('eaten!!');
           HapticFeedback.vibrate();
 
-          _audioPlayer.play(AssetSource('sounds/success.wav'));
+          _soundManager.playSound();
         }
         //snake = snake.move();
         //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
@@ -71,7 +72,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _timer.cancel();
-    _audioPlayer.dispose();
+    _soundManager.dispose();
     super.dispose();
   }
 
