@@ -16,10 +16,9 @@ class SoundManager {
       AssetSource('sounds/success.wav'),
       mode: PlayerMode.lowLatency,
     );
-    player.onPlayerComplete.first.then((_) => player.dispose());
-  }
+    await player.onPlayerComplete.first;
+    await player.dispose();
 
-  void dispose() {
-    //_audioPlayer.dispose();
+    //player.onPlayerComplete.first.then((_) => player.dispose());
   }
 }

@@ -72,7 +72,6 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _timer.cancel();
-    _soundManager.dispose();
     super.dispose();
   }
 
