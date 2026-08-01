@@ -38,41 +38,13 @@ class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
   late SoundManager _soundManager;
   String topInformationLine = 'Score: 0';
-
-  GameState gameState = GameState.initial();
+  late GameState gameState;
 
   //Snake snake = Snake.initial();
   @override
   void initState() {
+    _startGame();
     super.initState();
-    _soundManager = SoundManager();
-    _soundManager.init();
-
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      //print(snake.body);
-      //print(snake.direction);
-      setState(() {
-        topInformationLine = 'Score: ${gameState.score}';
-        final int oldEatenCount = gameState.eatenFoodLocations.length;
-        gameState = gameState.tick();
-        final int newEatenCount = gameState.eatenFoodLocations.length;
-        //print('Age of food: ${gameState.ageOfFood()}');
-        if (gameState.isGameOver == true) {
-          topInformationLine = ('GAME OVER\nscore ${gameState.score}');
-          _timer.cancel();
-        }
-
-        if (newEatenCount > oldEatenCount) {
-          //snake has eaten some food!
-          print('eaten!!');
-          HapticFeedback.vibrate();
-
-          _soundManager.playSound();
-        }
-        //snake = snake.move();
-        //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
-      });
-    });
   }
 
   @override
@@ -126,6 +98,9 @@ class _GameScreenState extends State<GameScreen> {
                       print('swipe left');
                     }
                   },
+                  onTap: () {
+                    print('tapped!');
+                  },
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: CustomPaint(
@@ -148,6 +123,37 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       gameState = gameState.changeDirection(newDir);
       //snake = snake.changeDirection(newDir);
+    });
+  }
+
+  void _startGame() {
+    _soundManager = SoundManager();
+    _soundManager.init();
+    gameState = GameState.initial();
+    _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      //print(snake.body);
+      //print(snake.direction);
+      setState(() {
+        topInformationLine = 'Score: ${gameState.score}';
+        final int oldEatenCount = gameState.eatenFoodLocations.length;
+        gameState = gameState.tick();
+        final int newEatenCount = gameState.eatenFoodLocations.length;
+        //print('Age of food: ${gameState.ageOfFood()}');
+        if (gameState.isGameOver == true) {
+          topInformationLine = ('GAME OVER\nscore ${gameState.score}');
+          _timer.cancel();
+        }
+
+        if (newEatenCount > oldEatenCount) {
+          //snake has eaten some food!
+          print('eaten!!');
+          HapticFeedback.vibrate();
+
+          _soundManager.playSound();
+        }
+        //snake = snake.move();
+        //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
+      });
     });
   }
 }
