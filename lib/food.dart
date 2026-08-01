@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 enum FoodType {
   red(color: Colors.red, maxAge: 100),
   yellow(color: Colors.yellow, maxAge: 50),
-  poison(color: Colors.deepPurple, maxAge: 125);
+  poison(color: Color.fromARGB(255, 12, 222, 15), maxAge: 125);
 
   final Color color;
   final int maxAge;

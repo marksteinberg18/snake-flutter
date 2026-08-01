@@ -37,6 +37,7 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
   late SoundManager _soundManager;
+  String topInformationLine = 'Score: 0';
 
   GameState gameState = GameState.initial();
 
@@ -51,10 +52,15 @@ class _GameScreenState extends State<GameScreen> {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
+        topInformationLine = 'Score: ${gameState.score}';
         final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
         final int newEatenCount = gameState.eatenFoodLocations.length;
         //print('Age of food: ${gameState.ageOfFood()}');
+        if (gameState.isGameOver == true) {
+          topInformationLine = ('GAME OVER\nscore ${gameState.score}');
+          _timer.cancel();
+        }
 
         if (newEatenCount > oldEatenCount) {
           //snake has eaten some food!
@@ -79,38 +85,60 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: GestureDetector(
-          onVerticalDragEnd: (details) {
-            print(details);
-            if (details.velocity.pixelsPerSecond.dy < 0) {
-              changeDirection(Direction.up);
-              print('swipe up');
-            } else {
-              changeDirection(Direction.down);
-              print('swipe down');
-            }
-          },
-          onHorizontalDragEnd: (details) {
-            print('Horizontal: $details');
-            if (details.velocity.pixelsPerSecond.dx > 0) {
-              changeDirection(Direction.right);
-
-              print('swipe right');
-            } else {
-              changeDirection(Direction.left);
-              print('swipe left');
-            }
-          },
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: CustomPaint(
-              painter: GamePainter(
-                snake: gameState.snake,
-                food: gameState.foodCell,
+      body: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 100,
+              child: Center(
+                child: Text(
+                  topInformationLine,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'ScoreLineFont',
+                    fontSize: 30,
+                  ),
+                ),
               ),
             ),
-          ),
+            Expanded(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    print(details);
+                    if (details.velocity.pixelsPerSecond.dy < 0) {
+                      changeDirection(Direction.up);
+                      print('swipe up');
+                    } else {
+                      changeDirection(Direction.down);
+                      print('swipe down');
+                    }
+                  },
+                  onHorizontalDragEnd: (details) {
+                    print('Horizontal: $details');
+                    if (details.velocity.pixelsPerSecond.dx > 0) {
+                      changeDirection(Direction.right);
+
+                      print('swipe right');
+                    } else {
+                      changeDirection(Direction.left);
+                      print('swipe left');
+                    }
+                  },
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: CustomPaint(
+                      painter: GamePainter(
+                        snake: gameState.snake,
+                        food: gameState.foodCell,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

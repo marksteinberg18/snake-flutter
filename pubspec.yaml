@@ -60,6 +60,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/sounds/success.wav
+  fonts:
+    - family: ScoreLineFont
+      fonts:
+        - asset: assets/fonts/Unkempt-Regular.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

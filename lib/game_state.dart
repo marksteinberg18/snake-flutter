@@ -6,16 +6,16 @@ class GameState {
   final Snake snake;
   final Food foodCell;
   final List<Cell> eatenFoodLocations;
-  final List<Cell> food_or_poison_onScreen;
   int ticksSinceMove;
   static const moveInterval = 0.2; //7 x 100ms = 700ms
+  bool isGameOver;
 
   GameState(
     this.snake,
     this.foodCell,
     this.eatenFoodLocations,
     this.ticksSinceMove,
-    this.food_or_poison_onScreen,
+    this.isGameOver,
   );
 
   GameState.initial()
@@ -23,19 +23,32 @@ class GameState {
       foodCell = Food.spawn(Snake.initial()),
       eatenFoodLocations = [],
       ticksSinceMove = 0,
-      food_or_poison_onScreen = [];
+      isGameOver = false;
 
   int get score {
-    return snake.body.length - 3;
+    return (snake.body.length - 3) * 100;
   }
 
   GameState tick() {
     ticksSinceMove++;
     Snake movedSnake = snake;
     if (ticksSinceMove == 2) {
+      //half speed
       //time for move
       ticksSinceMove = 0;
       movedSnake = snake.move();
+      //check for collision
+      bool collision = movedSnake.body.skip(1).contains(movedSnake.body.first);
+      if (collision == true) {
+        isGameOver = true;
+        return GameState(
+          snake,
+          foodCell,
+          eatenFoodLocations,
+          ticksSinceMove,
+          isGameOver,
+        );
+      }
       if (movedSnake.body.first == foodCell.cellFood) {
         //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
         eatenFoodLocations.add(foodCell.cellFood);
@@ -48,7 +61,7 @@ class GameState {
           Food.spawn(grownSnake),
           eatenFoodLocations,
           ticksSinceMove,
-          food_or_poison_onScreen,
+          isGameOver,
         );
       }
     }
@@ -62,7 +75,7 @@ class GameState {
         Food.spawn(movedSnake),
         eatenFoodLocations,
         ticksSinceMove,
-        food_or_poison_onScreen,
+        isGameOver,
       );
     }
     return GameState(
@@ -70,7 +83,7 @@ class GameState {
       agedFood,
       eatenFoodLocations,
       ticksSinceMove,
-      food_or_poison_onScreen,
+      isGameOver,
     );
   }
 
@@ -84,7 +97,7 @@ class GameState {
       foodCell,
       eatenFoodLocations,
       ticksSinceMove,
-      food_or_poison_onScreen,
+      isGameOver,
     );
   }
 }
