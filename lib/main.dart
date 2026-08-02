@@ -37,7 +37,10 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
   late SoundManager _soundManager;
-  String topInformationLine = 'Score: 0';
+  String aboveInformationLine1 = 'Score: 0';
+  String aboveInformationLine2 = 'Game Over';
+  String belowInformationLine1 = 'Tap Grid';
+  String belowInformationLine2 = 'To Start Again';
   late GameState gameState;
 
   //Snake snake = Snake.initial();
@@ -60,20 +63,33 @@ class _GameScreenState extends State<GameScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(
-              height: 100,
-              child: Center(
-                child: Text(
-                  topInformationLine,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'ScoreLineFont',
-                    fontSize: 30,
+            Expanded(
+              flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    aboveInformationLine1,
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontFamily: 'ScoreLineFont',
+                      fontSize: 30,
+                    ),
                   ),
-                ),
+                  Text(
+                    gameState.isGameOver ? aboveInformationLine2 : '',
+                    style: TextStyle(
+                      color: Colors.pink,
+                      fontFamily: 'ScoreLineFont',
+                      fontSize: 30,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
+              flex: 2,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: GestureDetector(
@@ -99,7 +115,9 @@ class _GameScreenState extends State<GameScreen> {
                     }
                   },
                   onTap: () {
-                    print('tapped!');
+                    if (gameState.isGameOver) {
+                      _startGame();
+                    }
                   },
                   child: AspectRatio(
                     aspectRatio: 1,
@@ -111,6 +129,30 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                 ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    gameState.isGameOver ? belowInformationLine1 : '',
+                    style: TextStyle(
+                      color: Colors.yellow,
+                      fontFamily: 'ScoreLineFont',
+                      fontSize: 30,
+                    ),
+                  ),
+                  Text(
+                    gameState.isGameOver ? belowInformationLine2 : '',
+                    style: TextStyle(
+                      color: Colors.yellow,
+                      fontFamily: 'ScoreLineFont',
+                      fontSize: 30,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -129,18 +171,19 @@ class _GameScreenState extends State<GameScreen> {
   void _startGame() {
     _soundManager = SoundManager();
     _soundManager.init();
-    gameState = GameState.initial();
+    setState(() {
+      gameState = GameState.initial();
+    });
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
-        topInformationLine = 'Score: ${gameState.score}';
         final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
+        aboveInformationLine1 = 'Score: ${gameState.score}';
         final int newEatenCount = gameState.eatenFoodLocations.length;
         //print('Age of food: ${gameState.ageOfFood()}');
         if (gameState.isGameOver == true) {
-          topInformationLine = ('GAME OVER\nscore ${gameState.score}');
           _timer.cancel();
         }
 
