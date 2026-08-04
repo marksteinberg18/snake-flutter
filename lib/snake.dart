@@ -14,6 +14,7 @@ class Snake {
     direction = Direction.values[Random().nextInt(4)];
     final Cell head = Cell(10, 10);
     body = switch (direction) {
+      //body include the head
       Direction.right => [head, Cell(9, 10), Cell(8, 10)],
       Direction.left => [Cell(9, 10), Cell(10, 10), Cell(11, 10)],
       Direction.up => [head, Cell(10, 11), Cell(10, 12)],

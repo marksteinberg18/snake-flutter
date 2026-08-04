@@ -179,6 +179,7 @@ class _GameScreenState extends State<GameScreen> {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
+        print('Poison food location: ${gameState.poisonLocations.first}');
         final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
         aboveInformationLine1 = 'Score: ${gameState.score}';

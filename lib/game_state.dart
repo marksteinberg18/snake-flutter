@@ -1,6 +1,7 @@
 import 'cell.dart';
 import 'snake.dart';
 import 'food.dart';
+import 'dart:math';
 
 class GameState {
   final Snake snake;
@@ -61,6 +62,11 @@ class GameState {
           body: [...movedSnake.body, snake.body.last],
           direction: movedSnake.direction,
         );
+        //if third food then spawn poison
+        if (eatenFoodLocations.length % 3 == 0 &&
+            eatenFoodLocations.isNotEmpty) {
+          poisonLocations.add(_spawnPoison()); //add new
+        }
         return GameState(
           grownSnake,
           Food.spawn(grownSnake),
@@ -71,9 +77,6 @@ class GameState {
         );
       }
       //spawn poison if has eaten 3 foods
-      if (eatenFoodLocations.length % 3 == 0) {
-        _spawnPoison();
-      }
     }
     //age food - non eaten branch, called at each tick
     Food agedFood =
@@ -114,5 +117,16 @@ class GameState {
     );
   }
 
-  Cell _spawnPoison() {}
+  Cell _spawnPoison() {
+    //work out where we cannot go
+    final occupied = snake.body.toSet(); //snake
+    occupied.add(foodCell.cellFood); //current food cell
+    occupied.addAll(poisonLocations);
+    //now... where can we go?
+    Cell newPoison;
+    do {
+      newPoison = Cell(Random().nextInt(20), Random().nextInt(20));
+    } while (occupied.contains(newPoison));
+    return newPoison;
+  }
 }
