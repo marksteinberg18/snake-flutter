@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'snake.dart';
 import 'food.dart';
+import 'cell.dart';
 
 class GamePainter extends CustomPainter {
   final Snake snake;
   final Food food;
-  GamePainter({required this.snake, required this.food});
+  final List<Cell> poisonLocations;
+
+  GamePainter({
+    required this.snake,
+    required this.food,
+    required this.poisonLocations,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {

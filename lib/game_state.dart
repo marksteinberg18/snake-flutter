@@ -9,6 +9,7 @@ class GameState {
   int ticksSinceMove;
   static const moveInterval = 0.2; //7 x 100ms = 700ms
   bool isGameOver;
+  final List<Cell> poisonLocations;
 
   GameState(
     this.snake,
@@ -16,6 +17,7 @@ class GameState {
     this.eatenFoodLocations,
     this.ticksSinceMove,
     this.isGameOver,
+    this.poisonLocations,
   );
 
   GameState.initial()
@@ -23,7 +25,8 @@ class GameState {
       foodCell = Food.spawn(Snake.initial()),
       eatenFoodLocations = [],
       ticksSinceMove = 0,
-      isGameOver = false;
+      isGameOver = false,
+      poisonLocations = [];
 
   int get score {
     return (snake.body.length - 3) * 100;
@@ -47,8 +50,10 @@ class GameState {
           eatenFoodLocations,
           ticksSinceMove,
           isGameOver,
+          poisonLocations,
         );
       }
+      //eaten food
       if (movedSnake.body.first == foodCell.cellFood) {
         //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
         eatenFoodLocations.add(foodCell.cellFood);
@@ -62,7 +67,12 @@ class GameState {
           eatenFoodLocations,
           ticksSinceMove,
           isGameOver,
+          poisonLocations,
         );
+      }
+      //spawn poison if has eaten 3 foods
+      if (eatenFoodLocations.length % 3 == 0) {
+        _spawnPoison();
       }
     }
     //age food - non eaten branch, called at each tick
@@ -76,6 +86,7 @@ class GameState {
         eatenFoodLocations,
         ticksSinceMove,
         isGameOver,
+        poisonLocations,
       );
     }
     return GameState(
@@ -84,6 +95,7 @@ class GameState {
       eatenFoodLocations,
       ticksSinceMove,
       isGameOver,
+      poisonLocations,
     );
   }
 
@@ -98,6 +110,9 @@ class GameState {
       eatenFoodLocations,
       ticksSinceMove,
       isGameOver,
+      poisonLocations,
     );
   }
+
+  Cell _spawnPoison() {}
 }

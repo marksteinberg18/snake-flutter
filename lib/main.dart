@@ -125,6 +125,7 @@ class _GameScreenState extends State<GameScreen> {
                       painter: GamePainter(
                         snake: gameState.snake,
                         food: gameState.foodCell,
+                        poisonLocations: gameState.poisonLocations,
                       ),
                     ),
                   ),
