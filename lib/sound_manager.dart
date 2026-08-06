@@ -11,6 +11,11 @@ class SoundManager {
   Future<void> playSound() async {
     print('beep!');
     final player = AudioPlayer();
+    await player.setAudioContext(
+      AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+      ),
+    );
     await player.setReleaseMode(ReleaseMode.stop);
     await player.play(
       AssetSource('sounds/success.wav'),

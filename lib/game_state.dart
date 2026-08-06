@@ -41,6 +41,7 @@ class GameState {
       //time for move
       ticksSinceMove = 0;
       movedSnake = snake.move();
+
       //check for collision
       bool collision = movedSnake.body.skip(1).contains(movedSnake.body.first);
       if (collision == true) {
@@ -76,7 +77,6 @@ class GameState {
           poisonLocations,
         );
       }
-      //spawn poison if has eaten 3 foods
     }
     //age food - non eaten branch, called at each tick
     Food agedFood =

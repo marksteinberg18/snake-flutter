@@ -4,6 +4,9 @@ class Cell {
 
   Cell(this.x, this.y);
 
+  @override
+  String toString() => 'Cell at $x,$y';
+
   void describe() {
     print('Cell at $x,$y');
   }

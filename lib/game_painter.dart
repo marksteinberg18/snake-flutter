@@ -16,6 +16,8 @@ class GamePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    //print('Poison: ${poisonLocations.length}');
+
     //print('Foodcell: ${food.cellFood.x},${food.cellFood.y}');
     final bgPaint = Paint();
     bgPaint.color = Colors.black;
@@ -79,8 +81,16 @@ class GamePainter extends CustomPainter {
       ),
       foodPaint,
     );
+    //display poison
+    _showPoison();
   }
 
   @override
   bool shouldRepaint(GamePainter oldDelegate) => true;
+
+  void _showPoison() {
+    if (poisonLocations.isNotEmpty) {
+      //e.g. Cell at 11,11
+    }
+  }
 }
