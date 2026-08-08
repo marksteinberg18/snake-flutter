@@ -62,7 +62,7 @@ class GamePainter extends CustomPainter {
         cell == snake.body.first ? headPaint : snakePaint,
       );
     }
-    //to print food red rectangle here....
+    //display food
     double alpha = ((food.type.maxAge - food.age) / (food.type.maxAge - 1))
         .clamp(0.0, 1.0);
     final foodPaint = Paint();
@@ -70,18 +70,19 @@ class GamePainter extends CustomPainter {
     //foodPaint.color = Colors.red.withValues(alpha: alpha);
     final int foodX = food.cellFood.x;
     final int foodY = food.cellFood.y;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          foodX * cellWidth + 1,
-          foodY * cellHeight + 1,
-          cellWidth,
-          cellHeight,
-        ),
-        Radius.circular(4),
-      ),
-      foodPaint,
-    );
+    _showFood(canvas, cellHeight, cellWidth, foodPaint, foodX, foodY);
+    // canvas.drawRRect(
+    //   RRect.fromRectAndRadius(
+    //     Rect.fromLTWH(
+    //       foodX * cellWidth + 1,
+    //       foodY * cellHeight + 1,
+    //       cellWidth,
+    //       cellHeight,
+    //     ),
+    //     Radius.circular(4),
+    //   ),
+    //   foodPaint,
+    // );
     //display poison
     _showPoison(canvas, cellHeight, cellWidth);
   }
@@ -92,18 +93,56 @@ class GamePainter extends CustomPainter {
   void _showPoison(Canvas canvas, double cellHeight, double cellWidth) {
     if (poisonLocations.isEmpty) return; //no poisons yet
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-    final double pulse =
+    final double pulseFade =
         0.75 + 0.25 * sin(DateTime.now().millisecondsSinceEpoch / 300);
+    final double pulseSize =
+        1.15 + 0.15 * sin(DateTime.now().millisecondsSinceEpoch / 500);
+
     final poisonPaint = Paint();
-    poisonPaint.color = Colors.deepPurple.withValues(alpha: pulse);
+    poisonPaint.color = Colors.deepPurple.withValues(alpha: pulseFade);
     for (final cell in poisonLocations) {
       textPainter.text = TextSpan(
         text: '☠️',
-        style: TextStyle(fontSize: cellWidth, foreground: poisonPaint),
+        style: TextStyle(
+          fontSize: cellWidth * pulseSize,
+          foreground: poisonPaint,
+        ),
       );
       textPainter.layout();
-      textPainter.paint(canvas, Offset(cell.x * cellWidth, cell.y * cellWidth));
+      //   textPainter.paint(
+      //     canvas,
+      //     Offset(cell.x * cellWidth, cell.y * cellHeight),
+      //   );
+      final double dx =
+          cell.x * cellWidth + (cellWidth - textPainter.width) / 2;
+      final double dy =
+          cell.y * cellHeight + (cellHeight - textPainter.height) / 2;
+
+      textPainter.paint((canvas), Offset(dx, dy));
       //e.g. Cell at 11,11
     }
+  }
+
+  void _showFood(
+    Canvas canvas,
+    double cellHeight,
+    double cellWidth,
+    Paint foodPaint,
+    int foodX,
+    int foodY,
+  ) {
+    final double pulseSize =
+        1.15 + 0.15 * sin(DateTime.now().millisecondsSinceEpoch / 500);
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    textPainter.text = TextSpan(
+      text: '🥫',
+      style: TextStyle(fontSize: cellWidth * pulseSize, foreground: foodPaint),
+    );
+    textPainter.layout();
+    final double dx = foodX * cellWidth + (cellWidth - textPainter.width) / 2;
+    final double dy =
+        foodY * cellHeight + (cellHeight - textPainter.height) / 2;
+
+    textPainter.paint((canvas), Offset(dx, dy));
   }
 }

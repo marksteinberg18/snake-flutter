@@ -93,25 +93,15 @@ class _GameScreenState extends State<GameScreen> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: GestureDetector(
-                  onVerticalDragEnd: (details) {
-                    print(details);
-                    if (details.velocity.pixelsPerSecond.dy < 0) {
-                      changeDirection(Direction.up);
-                      print('swipe up');
+                  onPanEnd: (details) {
+                    final double vx = details.velocity.pixelsPerSecond.dx;
+                    final double vy = details.velocity.pixelsPerSecond.dy;
+                    if (vx.abs() > vy.abs()) {
+                      changeDirection(
+                        vx > 0 ? Direction.right : Direction.left,
+                      );
                     } else {
-                      changeDirection(Direction.down);
-                      print('swipe down');
-                    }
-                  },
-                  onHorizontalDragEnd: (details) {
-                    print('Horizontal: $details');
-                    if (details.velocity.pixelsPerSecond.dx > 0) {
-                      changeDirection(Direction.right);
-
-                      print('swipe right');
-                    } else {
-                      changeDirection(Direction.left);
-                      print('swipe left');
+                      changeDirection(vy > 0 ? Direction.down : Direction.up);
                     }
                   },
                   onTap: () {
@@ -137,27 +127,77 @@ class _GameScreenState extends State<GameScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    gameState.isGameOver ? belowInformationLine1 : '',
-                    style: TextStyle(
-                      color: Colors.yellow,
-                      fontFamily: 'ScoreLineFont',
-                      fontSize: 30,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _statCard(
+                        icon: '🥫',
+                        label: 'FOOD EATEN',
+                        value: gameState.eatenFoodLocations.length,
+                        color: Colors.greenAccent,
+                      ),
+                      const SizedBox(width: 16),
+                      _statCard(
+                        icon: '☠️',
+                        label: 'POISONS',
+                        value: gameState.poisonLocations.length,
+                        color: Colors.deepPurple,
+                      ),
+                    ],
                   ),
-                  Text(
-                    gameState.isGameOver ? belowInformationLine2 : '',
-                    style: TextStyle(
-                      color: Colors.yellow,
-                      fontFamily: 'ScoreLineFont',
-                      fontSize: 30,
-                    ),
-                  ),
+                  // Text(
+                  //   gameState.isGameOver ? belowInformationLine1 : '',
+                  //   style: TextStyle(
+                  //     color: Colors.yellow,
+                  //     fontFamily: 'ScoreLineFont',
+                  //     fontSize: 30,
+                  //   ),
+                  // ),
+                  // Text(
+                  //   gameState.isGameOver ? belowInformationLine2 : '',
+                  //   style: TextStyle(
+                  //     color: Colors.yellow,
+                  //     fontFamily: 'ScoreLineFont',
+                  //     fontSize: 30,
+                  //   ),
+                  // ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _statCard({
+    required String icon,
+    required String label,
+    required int value,
+    required Color color,
+  }) {
+    return Container(
+      width: 140,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color, width: 2),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 28)),
+          const SizedBox(height: 4),
+          Text(
+            '$value',
+            style: TextStyle(
+              color: color,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
