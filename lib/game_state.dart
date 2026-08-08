@@ -11,6 +11,7 @@ class GameState {
   static const moveInterval = 0.2; //7 x 100ms = 700ms
   bool isGameOver;
   final List<Cell> poisonLocations;
+  static final Random _random = Random();
 
   GameState(
     this.snake,
@@ -128,7 +129,7 @@ class GameState {
     //now... where can we go?
     Cell newPoison;
     do {
-      newPoison = Cell(Random().nextInt(20), Random().nextInt(20));
+      newPoison = Cell(_random.nextInt(20), _random.nextInt(20));
     } while (occupied.contains(newPoison));
     return newPoison;
   }

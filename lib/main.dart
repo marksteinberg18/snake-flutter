@@ -65,28 +65,46 @@ class _GameScreenState extends State<GameScreen> {
           children: [
             Expanded(
               flex: 1,
-              child: Column(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    aboveInformationLine1,
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontFamily: 'ScoreLineFont',
-                      fontSize: 30,
-                    ),
+                  _belowGridCard(
+                    icon: '✅',
+                    label: 'SCORE',
+                    value: gameState.score,
+                    color: Colors.green,
                   ),
-                  Text(
-                    gameState.isGameOver ? aboveInformationLine2 : '',
-                    style: TextStyle(
-                      color: Colors.pink,
-                      fontFamily: 'ScoreLineFont',
-                      fontSize: 30,
-                    ),
+                  const SizedBox(width: 16),
+                  _belowGridCard(
+                    icon: '🏆',
+                    label: 'BEST',
+                    value: 0,
+                    color: Colors.red,
                   ),
                 ],
               ),
+              // child: Column(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     Text(
+              //       aboveInformationLine1,
+              //       style: TextStyle(
+              //         color: Colors.green,
+              //         fontFamily: 'ScoreLineFont',
+              //         fontSize: 30,
+              //       ),
+              //     ),
+              //     Text(
+              //       gameState.isGameOver ? aboveInformationLine2 : '',
+              //       style: TextStyle(
+              //         color: Colors.pink,
+              //         fontFamily: 'ScoreLineFont',
+              //         fontSize: 30,
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ),
             Expanded(
               flex: 2,
@@ -130,14 +148,14 @@ class _GameScreenState extends State<GameScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _statCard(
+                      _belowGridCard(
                         icon: '🥫',
                         label: 'FOOD EATEN',
                         value: gameState.eatenFoodLocations.length,
                         color: Colors.greenAccent,
                       ),
                       const SizedBox(width: 16),
-                      _statCard(
+                      _belowGridCard(
                         icon: '☠️',
                         label: 'POISONS',
                         value: gameState.poisonLocations.length,
@@ -170,7 +188,7 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _statCard({
+  Widget _belowGridCard({
     required String icon,
     required String label,
     required int value,
