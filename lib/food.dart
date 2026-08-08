@@ -9,6 +9,7 @@ enum FoodType {
 
   final Color color;
   final int maxAge;
+
   const FoodType({required this.color, required this.maxAge});
 }
 
@@ -17,6 +18,7 @@ class Food {
   final int age;
   static const int maxAge = 100; //100 * 100ms = 10s until fully faded
   final FoodType type;
+  static final Random _random = Random();
 
   Food(this.cellFood, this.age, this.type);
 
@@ -24,7 +26,7 @@ class Food {
     final occupied = snake.body.toSet();
     Cell candidate;
     do {
-      candidate = Cell(Random().nextInt(20), Random().nextInt(20));
+      candidate = Cell(_random.nextInt(20), _random.nextInt(20));
     } while (occupied.contains(candidate));
 
     final type = FoodType.values[Random().nextInt(FoodType.values.length)];
