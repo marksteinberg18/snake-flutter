@@ -43,8 +43,11 @@ class GameState {
       movedSnake = snake.move();
 
       //check for collision
-      bool collision = movedSnake.body.skip(1).contains(movedSnake.body.first);
-      if (collision == true) {
+      bool selfCollision = movedSnake.body
+          .skip(1)
+          .contains(movedSnake.body.first);
+      bool poisonCollision = poisonLocations.contains(movedSnake.body.first);
+      if (selfCollision || poisonCollision == true) {
         isGameOver = true;
         return GameState(
           snake,

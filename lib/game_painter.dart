@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'snake.dart';
 import 'food.dart';
 import 'cell.dart';
+import 'dart:math';
 
 class GamePainter extends CustomPainter {
   final Snake snake;
@@ -82,14 +83,26 @@ class GamePainter extends CustomPainter {
       foodPaint,
     );
     //display poison
-    _showPoison();
+    _showPoison(canvas, cellHeight, cellWidth);
   }
 
   @override
   bool shouldRepaint(GamePainter oldDelegate) => true;
 
-  void _showPoison() {
-    if (poisonLocations.isNotEmpty) {
+  void _showPoison(Canvas canvas, double cellHeight, double cellWidth) {
+    if (poisonLocations.isEmpty) return; //no poisons yet
+    final textPainter = TextPainter(textDirection: TextDirection.ltr);
+    final double pulse =
+        0.75 + 0.25 * sin(DateTime.now().millisecondsSinceEpoch / 300);
+    final poisonPaint = Paint();
+    poisonPaint.color = Colors.deepPurple.withValues(alpha: pulse);
+    for (final cell in poisonLocations) {
+      textPainter.text = TextSpan(
+        text: '☠️',
+        style: TextStyle(fontSize: cellWidth, foreground: poisonPaint),
+      );
+      textPainter.layout();
+      textPainter.paint(canvas, Offset(cell.x * cellWidth, cell.y * cellWidth));
       //e.g. Cell at 11,11
     }
   }
