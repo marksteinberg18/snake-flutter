@@ -42,7 +42,6 @@ class Snake {
       Direction.down => body.first.moveDown(),
       Direction.left => body.first.moveLeft(),
     };
-
     //Cell newHead = body.first;
     List<Cell> newBody = [];
     newBody.add(newHead);

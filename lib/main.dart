@@ -65,46 +65,26 @@ class _GameScreenState extends State<GameScreen> {
           children: [
             Expanded(
               flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _belowGridCard(
-                    icon: '✅',
-                    label: 'SCORE',
-                    value: gameState.score,
-                    color: Colors.green,
-                  ),
-                  const SizedBox(width: 16),
-                  _belowGridCard(
-                    icon: '🏆',
-                    label: 'BEST',
-                    value: 0,
-                    color: Colors.red,
-                  ),
-                ],
-              ),
-              // child: Column(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     Text(
-              //       aboveInformationLine1,
-              //       style: TextStyle(
-              //         color: Colors.green,
-              //         fontFamily: 'ScoreLineFont',
-              //         fontSize: 30,
-              //       ),
-              //     ),
-              //     Text(
-              //       gameState.isGameOver ? aboveInformationLine2 : '',
-              //       style: TextStyle(
-              //         color: Colors.pink,
-              //         fontFamily: 'ScoreLineFont',
-              //         fontSize: 30,
-              //       ),
-              //     ),
-              //   ],
-              // ),
+              child: _displayCards([
+                _cardGenerator(
+                  icon: '✅',
+                  label: 'SCORE',
+                  valueAsString: gameState.score.toString(),
+                  color: Colors.green,
+                ),
+                _cardGenerator(
+                  icon: '🐍',
+                  label: 'LIVES',
+                  valueAsString: '❤️' * gameState.lives,
+                  color: Colors.red,
+                ),
+                _cardGenerator(
+                  icon: '🏆',
+                  label: 'BEST',
+                  valueAsString: '0',
+                  color: Colors.red,
+                ),
+              ]),
             ),
             Expanded(
               flex: 2,
@@ -145,24 +125,22 @@ class _GameScreenState extends State<GameScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _belowGridCard(
-                        icon: '🥫',
-                        label: 'FOOD EATEN',
-                        value: gameState.eatenFoodLocations.length,
-                        color: Colors.greenAccent,
-                      ),
-                      const SizedBox(width: 16),
-                      _belowGridCard(
-                        icon: '☠️',
-                        label: 'POISONS',
-                        value: gameState.poisonLocations.length,
-                        color: Colors.deepPurple,
-                      ),
-                    ],
-                  ),
+                  _displayCards([
+                    _cardGenerator(
+                      icon: '🥫',
+                      label: 'FOOD EATEN',
+                      valueAsString:
+                          gameState.eatenFoodLocations.length.toString(),
+                      color: Colors.greenAccent,
+                    ),
+                    _cardGenerator(
+                      icon: '☠️',
+                      label: 'POISONS',
+                      valueAsString:
+                          gameState.poisonLocations.length.toString(),
+                      color: Colors.deepPurple,
+                    ),
+                  ]),
                   // Text(
                   //   gameState.isGameOver ? belowInformationLine1 : '',
                   //   style: TextStyle(
@@ -188,10 +166,21 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  Widget _belowGridCard({
+  Widget _displayCards(List<Widget> cards) {
+    final List<Widget> rowChildren = [];
+    for (int i = 0; i < cards.length; i++) {
+      if (i > 0) {
+        rowChildren.add(const SizedBox(width: 16));
+      }
+      rowChildren.add(Expanded(child: cards[i]));
+    }
+    return Row(children: rowChildren);
+  }
+
+  Widget _cardGenerator({
     required String icon,
     required String label,
-    required int value,
+    required String valueAsString,
     required Color color,
   }) {
     return Container(
@@ -205,14 +194,23 @@ class _GameScreenState extends State<GameScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 28)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              icon,
+              style: const TextStyle(fontSize: 28, color: Colors.red),
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(
-            '$value',
-            style: TextStyle(
-              color: color,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              '$valueAsString',
+              style: TextStyle(
+                color: color,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
