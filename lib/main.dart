@@ -240,21 +240,27 @@ class _GameScreenState extends State<GameScreen> {
         aboveInformationLine1 = 'Score: ${gameState.score}';
         final int newEatenCount = gameState.eatenFoodLocations.length;
         //print('Age of food: ${gameState.ageOfFood()}');
+
+        //import gameEvent and playsound
+        switch (gameState.lastEvent) {
+          case GameEvent.ateFood:
+            _soundManager.playSoundSuccess();
+            break;
+          case GameEvent.poisonGenerated:
+            _soundManager.playSoundPoison();
+            break;
+          case GameEvent.selfCollision:
+            //sound for lost game
+            break;
+          case GameEvent.atePoison:
+            //sound for eaten poison
+            break;
+          case GameEvent.none:
+            break;
+        }
         if (gameState.isGameOver == true) {
           _timer.cancel();
         }
-
-        //import gameEvent and playsound
-
-        if (newEatenCount > oldEatenCount) {
-          //snake has eaten some food!
-          print('eaten!!');
-          HapticFeedback.vibrate();
-
-          //_soundManager.playSoundSuccess();
-        }
-        //snake = snake.move();
-        //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');
       });
     });
   }

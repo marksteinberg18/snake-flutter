@@ -3,7 +3,7 @@ import 'snake.dart';
 import 'food.dart';
 import 'dart:math';
 
-enum GameEvent { none, ateFood, atePoison, selfCollision }
+enum GameEvent { none, ateFood, atePoison, poisonGenerated, selfCollision }
 
 class GameState {
   final Snake snake;
@@ -114,14 +114,15 @@ class GameState {
             isGameOver,
             poisonLocations,
             lives,
-            GameEvent.atePoison,
+            GameEvent.poisonGenerated,
           );
         }
       }
 
       //eaten food
+
       if (movedSnake.body.first == foodCell.cellFood) {
-        //final List<Cell> newEaten = [...eatenFoodLocations, food.foodCell];
+        bool poisonGenerated = false;
         eatenFoodLocations.add(foodCell.cellFood);
         final Snake grownSnake = Snake(
           body: [...movedSnake.body, snake.body.last],
@@ -130,7 +131,8 @@ class GameState {
         //if third food then spawn poison
         if (eatenFoodLocations.length % 3 == 0 &&
             eatenFoodLocations.isNotEmpty) {
-          poisonLocations.add(_spawnPoison(grownSnake)); //add new
+          poisonLocations.add(_spawnPoison(grownSnake));
+          poisonGenerated = true; //add new
         }
         return GameState(
           grownSnake,
@@ -140,7 +142,7 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          GameEvent.ateFood,
+          poisonGenerated ? GameEvent.atePoison : GameEvent.ateFood,
         );
       }
     }
