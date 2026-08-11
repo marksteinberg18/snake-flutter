@@ -3,6 +3,8 @@ import 'snake.dart';
 import 'food.dart';
 import 'dart:math';
 
+enum GameEvent { none, ateFood, atePoison, selfCollision }
+
 class GameState {
   final Snake snake;
   final Food foodCell;
@@ -13,6 +15,7 @@ class GameState {
   final List<Cell> poisonLocations;
   static final Random _random = Random();
   int lives;
+  final GameEvent lastEvent;
 
   GameState(
     this.snake,
@@ -22,16 +25,18 @@ class GameState {
     this.isGameOver,
     this.poisonLocations,
     this.lives,
+    this.lastEvent,
   );
 
   GameState.initial()
     : snake = Snake.initial(),
-      foodCell = Food.spawn(Snake.initial()),
       eatenFoodLocations = [],
       ticksSinceMove = 0,
       isGameOver = false,
       poisonLocations = [],
-      lives = 3;
+      foodCell = Food.spawn(Snake.initial(), []),
+      lives = 3,
+      lastEvent = GameEvent.none;
 
   int get score {
     return (snake.body.length - 3) * 100 * (1 + poisonLocations.length);
@@ -60,6 +65,7 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
+          GameEvent.selfCollision,
         );
       }
 
@@ -77,14 +83,13 @@ class GameState {
             isGameOver,
             poisonLocations,
             lives,
+            GameEvent.atePoison,
           );
         } else {
           //reset snake
           Snake resetSnake = Snake.initial();
           //check if poison or food is overlying the snake's initial position
-          bool poisonOverlying = resetSnake.body.any(
-            (cell) => poisonLocations.contains(cell),
-          );
+
           List<Cell> poisonsClashingWithSnake =
               poisonLocations
                   .where(((poison) => resetSnake.body.contains(poison)))
@@ -98,7 +103,7 @@ class GameState {
             }
             //respawn
             for (int i = 0; i < numberPoisonsAffected; i++) {
-              _spawnPoison();
+              poisonLocations.add(_spawnPoison(resetSnake));
             }
           }
           return GameState(
@@ -109,6 +114,7 @@ class GameState {
             isGameOver,
             poisonLocations,
             lives,
+            GameEvent.atePoison,
           );
         }
       }
@@ -124,16 +130,17 @@ class GameState {
         //if third food then spawn poison
         if (eatenFoodLocations.length % 3 == 0 &&
             eatenFoodLocations.isNotEmpty) {
-          poisonLocations.add(_spawnPoison()); //add new
+          poisonLocations.add(_spawnPoison(grownSnake)); //add new
         }
         return GameState(
           grownSnake,
-          Food.spawn(grownSnake),
+          Food.spawn(grownSnake, poisonLocations),
           eatenFoodLocations,
           ticksSinceMove,
           isGameOver,
           poisonLocations,
           lives,
+          GameEvent.ateFood,
         );
       }
     }
@@ -144,12 +151,13 @@ class GameState {
     if (agedFood.age > agedFood.type.maxAge) {
       return GameState(
         movedSnake,
-        Food.spawn(movedSnake),
+        Food.spawn(movedSnake, poisonLocations),
         eatenFoodLocations,
         ticksSinceMove,
         isGameOver,
         poisonLocations,
         lives,
+        GameEvent.none,
       );
     }
     return GameState(
@@ -160,6 +168,7 @@ class GameState {
       isGameOver,
       poisonLocations,
       lives,
+      GameEvent.none,
     );
   }
 
@@ -176,10 +185,11 @@ class GameState {
       isGameOver,
       poisonLocations,
       lives,
+      GameEvent.none,
     );
   }
 
-  Cell _spawnPoison() {
+  Cell _spawnPoison(Snake snake) {
     //work out where we cannot go
     final occupied = snake.body.toSet(); //snake
     occupied.add(foodCell.cellFood); //current food cell

@@ -60,6 +60,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/sounds/success.wav
+    - assets/sounds/poison.wav
   fonts:
     - family: ScoreLineFont
       fonts:

@@ -244,12 +244,14 @@ class _GameScreenState extends State<GameScreen> {
           _timer.cancel();
         }
 
+        //import gameEvent and playsound
+
         if (newEatenCount > oldEatenCount) {
           //snake has eaten some food!
           print('eaten!!');
           HapticFeedback.vibrate();
 
-          _soundManager.playSound();
+          //_soundManager.playSoundSuccess();
         }
         //snake = snake.move();
         //print('x: ${snake.body.first.x}\t y:${snake.body.first.y}');

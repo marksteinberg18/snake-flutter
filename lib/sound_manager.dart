@@ -8,7 +8,7 @@ class SoundManager {
     await _audioPlayer.setSource(AssetSource('sounds/success.wav'));
   }
 
-  Future<void> playSound() async {
+  Future<void> playSoundSuccess() async {
     print('beep!');
     final player = AudioPlayer();
     await player.setAudioContext(
@@ -23,7 +23,22 @@ class SoundManager {
     );
     await player.onPlayerComplete.first;
     await player.dispose();
+  }
 
-    //player.onPlayerComplete.first.then((_) => player.dispose());
+  Future<void> playSoundPoison() async {
+    print('beep!');
+    final player = AudioPlayer();
+    await player.setAudioContext(
+      AudioContext(
+        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+      ),
+    );
+    await player.setReleaseMode(ReleaseMode.stop);
+    await player.play(
+      AssetSource('sounds/poison.wav'),
+      mode: PlayerMode.lowLatency,
+    );
+    await player.onPlayerComplete.first;
+    await player.dispose();
   }
 }
