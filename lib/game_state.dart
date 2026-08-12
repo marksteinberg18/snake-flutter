@@ -3,7 +3,7 @@ import 'snake.dart';
 import 'food.dart';
 import 'dart:math';
 
-enum GameEvent { none, ateFood, atePoison, poisonGenerated, selfCollision }
+enum GameEvent { none, ateFood, atePoison, poisonGenerated, gameOver }
 
 class GameState {
   final Snake snake;
@@ -65,7 +65,7 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          GameEvent.selfCollision,
+          GameEvent.gameOver,
         );
       }
 
@@ -83,9 +83,10 @@ class GameState {
             isGameOver,
             poisonLocations,
             lives,
-            GameEvent.atePoison,
+            GameEvent.gameOver,
           );
         } else {
+          //still lives remaining
           //reset snake
           Snake resetSnake = Snake.initial();
           //check if poison or food is overlying the snake's initial position
@@ -114,7 +115,7 @@ class GameState {
             isGameOver,
             poisonLocations,
             lives,
-            GameEvent.poisonGenerated,
+            GameEvent.atePoison,
           );
         }
       }
@@ -142,7 +143,7 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          poisonGenerated ? GameEvent.atePoison : GameEvent.ateFood,
+          poisonGenerated ? GameEvent.poisonGenerated : GameEvent.ateFood,
         );
       }
     }
