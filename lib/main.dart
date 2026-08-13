@@ -247,8 +247,7 @@ class _GameScreenState extends State<GameScreen> {
             _soundManager.playSoundSuccess();
             break;
           case GameEvent.poisonGenerated:
-            _soundManager.playSoundSuccess();
-            _soundManager.playSoundPoison();
+            _soundManager.playSuccessThenPoisonSound();
             break;
           case GameEvent.gameOver:
             //sound for lost game
