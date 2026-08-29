@@ -1,69 +1,54 @@
 import 'package:audioplayers/audioplayers.dart';
 
 class SoundManager {
-  final _audioPlayer = AudioPlayer();
+  // Claude's suggestion: one dedicated player per sound - created once and used multiple times
+  final AudioPlayer _successPlayer = AudioPlayer();
+  final AudioPlayer _poisonPlayer = AudioPlayer();
+
+  //Called ONE when game starts...
 
   Future<void> init() async {
-    await _audioPlayer.setReleaseMode(ReleaseMode.release);
-    await _audioPlayer.setSource(AssetSource('sounds/success.wav'));
+    //Configure both players up front
+    for (final player in [_successPlayer, _poisonPlayer]) {
+      await player.setReleaseMode(ReleaseMode.stop);
+      await player.setAudioContext(
+        AudioContext(
+          android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
+        ),
+      );
+    }
+    //pre-load the sound files so first play isn't delayed...
+    await _successPlayer.setSource(AssetSource('sounds/success.wav'));
+    await _poisonPlayer.setSource(AssetSource('sounds/poison.wav'));
   }
 
-  Future<void> playSoundSuccess() async {
-    print('beep!');
-    final player = AudioPlayer();
-    await player.setAudioContext(
-      AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-      ),
-    );
-    await player.setReleaseMode(ReleaseMode.stop);
-    await player.play(
+  //Play sounds when required - no need to wait for completion
+  Future<void> playSuccess() async {
+    await _successPlayer.stop(); //rewind to beginning
+    await _successPlayer.play(
       AssetSource('sounds/success.wav'),
       mode: PlayerMode.lowLatency,
     );
-    await player.onPlayerComplete.first;
-    //await player.dispose();
   }
 
-  Future<void> playSoundPoison() async {
-    final player = AudioPlayer();
-    await player.setAudioContext(
-      AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-      ),
-    );
-    await player.setReleaseMode(ReleaseMode.stop);
-    await player.play(
+  Future<void> playPoison() async {
+    await _poisonPlayer.stop();
+    await _poisonPlayer.play(
       AssetSource('sounds/poison.wav'),
       mode: PlayerMode.lowLatency,
     );
-    await player.onPlayerComplete.first;
-    await player.dispose();
   }
 
-  Future<void> playSuccessThenPoisonSound() async {
-    final player = AudioPlayer();
-    await player.setAudioContext(
-      AudioContext(
-        android: AudioContextAndroid(audioFocus: AndroidAudioFocus.none),
-      ),
-    );
-    await player.setReleaseMode(ReleaseMode.stop);
-    await player.play(
-      AssetSource('sounds/success.wav'),
-      mode: PlayerMode.lowLatency,
-    );
-    await Future.delayed(const Duration(seconds: 1));
-    await player
-        .play(AssetSource('sounds/poison.wav'), mode: PlayerMode.lowLatency)
-        .catchError((error) {
-          print('Poison sound error: $error');
-        });
-    await player.onPlayerComplete.first;
-    await player.dispose();
+  //Success, then poison after short gap
+  Future<void> playSuccessThenPoison() async {
+    await playSuccess();
+    await Future.delayed(const Duration(milliseconds: 400));
+    await playPoison();
   }
 
-  // await playSoundSuccess();
-  // await Future.delayed(const Duration(seconds: 1));
-  // await playSoundPoison();
+  //Call when game is disposed to clear up...
+  Future<void> disposeSounds() async {
+    await _successPlayer.dispose();
+    await _poisonPlayer.dispose();
+  }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:snake_flutter/game_painter.dart';
+import 'game_painter.dart';
 import 'cell.dart';
 import 'snake.dart';
 import 'dart:async';
@@ -53,6 +53,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _timer.cancel();
+    _soundManager.disposeSounds();
     super.dispose();
   }
 
@@ -244,10 +245,10 @@ class _GameScreenState extends State<GameScreen> {
         //import gameEvent and playsound
         switch (gameState.lastEvent) {
           case GameEvent.ateFood:
-            _soundManager.playSoundSuccess();
+            _soundManager.playSuccess();
             break;
           case GameEvent.poisonGenerated:
-            _soundManager.playSuccessThenPoisonSound();
+            _soundManager.playSuccessThenPoison();
             break;
           case GameEvent.gameOver:
             //sound for lost game

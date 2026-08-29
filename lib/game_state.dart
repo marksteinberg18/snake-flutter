@@ -196,7 +196,7 @@ class GameState {
     //work out where we cannot go
     final occupied = snake.body.toSet(); //snake
     occupied.add(foodCell.cellFood); //current food cell
-    occupied.addAll(poisonLocations);
+    occupied.addAll(poisonLocations); //can't go where we're already at
     //now... where can we go?
     Cell newPoison;
     do {
