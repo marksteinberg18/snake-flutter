@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'game_painter.dart';
-import 'cell.dart';
 import 'snake.dart';
 import 'dart:async';
 import 'game_state.dart';
-import 'food.dart';
-import 'package:flutter/services.dart';
 import 'sound_manager.dart';
 
 void main() {
@@ -206,7 +203,7 @@ class _GameScreenState extends State<GameScreen> {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              '$valueAsString',
+              valueAsString,
               style: TextStyle(
                 color: color,
                 fontSize: 24,
@@ -236,10 +233,8 @@ class _GameScreenState extends State<GameScreen> {
       //print(snake.body);
       //print(snake.direction);
       setState(() {
-        final int oldEatenCount = gameState.eatenFoodLocations.length;
         gameState = gameState.tick();
         aboveInformationLine1 = 'Score: ${gameState.score}';
-        final int newEatenCount = gameState.eatenFoodLocations.length;
         //print('Age of food: ${gameState.ageOfFood()}');
 
         //import gameEvent and playsound

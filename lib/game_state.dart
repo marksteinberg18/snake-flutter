@@ -17,6 +17,7 @@ class GameState {
   int lives;
   final GameEvent lastEvent;
   static const gridSize = Cell.gridSize;
+  int pauseTicksRemaining;
 
   GameState(
     this.snake,
@@ -27,6 +28,7 @@ class GameState {
     this.poisonLocations,
     this.lives,
     this.lastEvent,
+    this.pauseTicksRemaining,
   );
 
   GameState.initial()
@@ -37,13 +39,61 @@ class GameState {
       poisonLocations = [],
       foodCell = Food.spawn(Snake.initial(), []),
       lives = 3,
-      lastEvent = GameEvent.none;
+      lastEvent = GameEvent.none,
+      pauseTicksRemaining = 0;
 
   int get score {
     return (snake.body.length - 3) * 100 * (1 + poisonLocations.length);
   }
 
   GameState tick() {
+    if (pauseTicksRemaining > 0) {
+      pauseTicksRemaining--; //we're in a pause state - life lost, count down
+      if (pauseTicksRemaining == 0) {
+        //freeze JUST ended now
+        Snake resetSnake = Snake.initial();
+
+        //check if poison or food is overlying the snake's initial position
+        List<Cell> poisonsClashingWithSnake =
+            poisonLocations
+                .where(((poison) => resetSnake.body.contains(poison)))
+                .toList();
+
+        if (poisonsClashingWithSnake.isNotEmpty) {
+          int numberPoisonsAffected = poisonsClashingWithSnake.length;
+          //need to delete these entries first
+          for (Cell poison in poisonsClashingWithSnake) {
+            poisonLocations.remove(poison);
+          }
+          //respawn THAT number of deleted poisons elsewhere on board
+          for (int i = 0; i < numberPoisonsAffected; i++) {
+            poisonLocations.add(_spawnPoison(resetSnake));
+          }
+        }
+        return GameState(
+          resetSnake,
+          foodCell,
+          eatenFoodLocations,
+          ticksSinceMove,
+          isGameOver,
+          poisonLocations,
+          lives,
+          GameEvent.atePoison,
+          pauseTicksRemaining,
+        );
+      }
+      return GameState(
+        snake,
+        foodCell,
+        eatenFoodLocations,
+        ticksSinceMove,
+        isGameOver,
+        poisonLocations,
+        lives,
+        GameEvent.none,
+        pauseTicksRemaining,
+      );
+    }
     ticksSinceMove++;
     Snake movedSnake = snake;
     if (ticksSinceMove == 2) {
@@ -67,6 +117,7 @@ class GameState {
           poisonLocations,
           lives,
           GameEvent.gameOver,
+          pauseTicksRemaining,
         );
       }
 
@@ -77,48 +128,32 @@ class GameState {
         if (lives == 0) {
           isGameOver = true;
           return GameState(
-            snake,
+            movedSnake,
             foodCell,
             eatenFoodLocations,
             ticksSinceMove,
             isGameOver,
             poisonLocations,
             lives,
-            GameEvent.gameOver,
-          );
-        } else {
-          //still lives remaining
-          //reset snake
-          Snake resetSnake = Snake.initial();
-          //check if poison or food is overlying the snake's initial position
-
-          List<Cell> poisonsClashingWithSnake =
-              poisonLocations
-                  .where(((poison) => resetSnake.body.contains(poison)))
-                  .toList();
-
-          if (poisonsClashingWithSnake.isNotEmpty) {
-            int numberPoisonsAffected = poisonsClashingWithSnake.length;
-            //need to delete these entries first
-            for (Cell poison in poisonsClashingWithSnake) {
-              poisonLocations.remove(poison);
-            }
-            //respawn
-            for (int i = 0; i < numberPoisonsAffected; i++) {
-              poisonLocations.add(_spawnPoison(resetSnake));
-            }
-          }
-          return GameState(
-            resetSnake,
-            foodCell,
-            eatenFoodLocations,
-            ticksSinceMove,
-            isGameOver,
-            poisonLocations,
-            lives,
-            GameEvent.atePoison,
+            GameEvent
+                .gameOver, //TODO gameOver should be divided to gameOverSelfCollision and gameOverLifesLost
+            pauseTicksRemaining,
           );
         }
+        pauseTicksRemaining =
+            15; //eaten poison - need to freeze, pause for 100ms x 15 = 1.5s
+
+        return GameState(
+          movedSnake,
+          foodCell,
+          eatenFoodLocations,
+          ticksSinceMove,
+          isGameOver,
+          poisonLocations,
+          lives,
+          GameEvent.atePoison,
+          pauseTicksRemaining,
+        );
       }
 
       //eaten food
@@ -127,7 +162,10 @@ class GameState {
         bool poisonGenerated = false;
         eatenFoodLocations.add(foodCell.cellFood);
         final Snake grownSnake = Snake(
-          body: [...movedSnake.body, snake.body.last],
+          body: [
+            ...movedSnake.body,
+            snake.body.last,
+          ], //how does this line work?
           direction: movedSnake.direction,
         );
         //if third food then spawn poison
@@ -144,7 +182,10 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          poisonGenerated ? GameEvent.poisonGenerated : GameEvent.ateFood,
+          poisonGenerated
+              ? GameEvent.poisonGenerated
+              : GameEvent.ateFood, //what happens with this line?
+          pauseTicksRemaining,
         );
       }
     }
@@ -162,6 +203,7 @@ class GameState {
         poisonLocations,
         lives,
         GameEvent.none,
+        pauseTicksRemaining,
       );
     }
     return GameState(
@@ -173,6 +215,7 @@ class GameState {
       poisonLocations,
       lives,
       GameEvent.none,
+      pauseTicksRemaining,
     );
   }
 
@@ -190,6 +233,7 @@ class GameState {
       poisonLocations,
       lives,
       GameEvent.none,
+      pauseTicksRemaining,
     );
   }
 
