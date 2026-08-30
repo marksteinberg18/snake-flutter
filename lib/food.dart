@@ -20,6 +20,7 @@ class Food {
   static const int maxAge = 100; //100 * 100ms = 10s until fully faded
   final FoodType type;
   static final Random _random = Random();
+  static const gridSize = Cell.gridSize;
 
   Food(this.cellFood, this.age, this.type);
 
@@ -28,7 +29,7 @@ class Food {
     occupied.addAll(poisonLocations);
     Cell candidate;
     do {
-      candidate = Cell(_random.nextInt(20), _random.nextInt(20));
+      candidate = Cell(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (occupied.contains(candidate));
     final type = FoodType.values[_random.nextInt(FoodType.values.length)];
     return Food(candidate, 0, type);

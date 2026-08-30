@@ -24,7 +24,7 @@ class GamePainter extends CustomPainter {
     bgPaint.color = Colors.black;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), bgPaint);
 
-    const int gridSize = 20;
+    const int gridSize = Cell.gridSize;
     final double cellWidth = size.width / gridSize;
     final double cellHeight = size.height / gridSize;
     final paint = Paint();

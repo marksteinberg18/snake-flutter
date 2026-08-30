@@ -16,6 +16,7 @@ class GameState {
   static final Random _random = Random();
   int lives;
   final GameEvent lastEvent;
+  static const gridSize = Cell.gridSize;
 
   GameState(
     this.snake,
@@ -197,10 +198,24 @@ class GameState {
     final occupied = snake.body.toSet(); //snake
     occupied.add(foodCell.cellFood); //current food cell
     occupied.addAll(poisonLocations); //can't go where we're already at
+    //exclude the row or column that we're travelling against:
+    Cell head = snake.body.first; //e.g. [3,5]
+    switch (snake.direction) {
+      case Direction.up || Direction.down:
+        //add whole column to occupied, already occupied will not be added to as a set
+        for (int y = 0; y <= gridSize; y++) {
+          occupied.add(Cell(head.x, y));
+        }
+      case Direction.left || Direction.right:
+        //add whole row to occupied, already occupied will not be added to as a set
+        for (int x = 0; x <= gridSize; x++) {
+          occupied.add(Cell(x, head.y));
+        }
+    }
     //now... where can we go?
     Cell newPoison;
     do {
-      newPoison = Cell(_random.nextInt(20), _random.nextInt(20));
+      newPoison = Cell(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (occupied.contains(newPoison));
     return newPoison;
   }

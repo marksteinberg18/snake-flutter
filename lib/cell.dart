@@ -1,6 +1,7 @@
 class Cell {
   int x;
   int y;
+  static const int gridSize = 20;
 
   Cell(this.x, this.y);
 
@@ -11,10 +12,10 @@ class Cell {
     print('Cell at $x,$y');
   }
 
-  Cell moveRight() => Cell((x + 1) % 20, y); //wraps one side to the next
-  Cell moveLeft() => Cell((x - 1 + 20) % 20, y);
-  Cell moveUp() => Cell(x, (y - 1 + 20) % 20);
-  Cell moveDown() => Cell(x, (y + 1) % 20);
+  Cell moveRight() => Cell((x + 1) % gridSize, y); //wraps one side to the next
+  Cell moveLeft() => Cell((x - 1 + gridSize) % gridSize, y);
+  Cell moveUp() => Cell(x, (y - 1 + gridSize) % gridSize);
+  Cell moveDown() => Cell(x, (y + 1) % gridSize);
 
   @override
   bool operator ==(Object other) =>
