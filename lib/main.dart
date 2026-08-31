@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Snake',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.dark,
+        ),
       ),
       home: GameScreen(), //const GameScreen(),
     );
@@ -33,7 +36,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Timer _timer;
-  late SoundManager _soundManager;
+  final SoundManager _soundManager = SoundManager();
   String aboveInformationLine1 = 'Score: 0';
   String aboveInformationLine2 = 'Game Over';
   String belowInformationLine1 = 'Tap Grid';
@@ -43,8 +46,9 @@ class _GameScreenState extends State<GameScreen> {
   //Snake snake = Snake.initial();
   @override
   void initState() {
-    _startGame();
     super.initState();
+    _soundManager.init(); //launch one time only
+    _startGame();
   }
 
   @override
@@ -61,33 +65,29 @@ class _GameScreenState extends State<GameScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            _displayCards([
+              _cardGenerator(
+                icon: '✅',
+                label: 'SCORE',
+                valueAsString: gameState.score.toString(),
+                color: Colors.green,
+              ),
+              _cardGenerator(
+                icon: '🐍',
+                label: 'LIVES',
+                valueAsString: '❤️' * gameState.lives,
+                color: Colors.red,
+              ),
+              _cardGenerator(
+                icon: '🏆',
+                label: 'BEST',
+                valueAsString: '0',
+                color: Colors.red,
+              ),
+            ]),
             Expanded(
-              flex: 1,
-              child: _displayCards([
-                _cardGenerator(
-                  icon: '✅',
-                  label: 'SCORE',
-                  valueAsString: gameState.score.toString(),
-                  color: Colors.green,
-                ),
-                _cardGenerator(
-                  icon: '🐍',
-                  label: 'LIVES',
-                  valueAsString: '❤️' * gameState.lives,
-                  color: Colors.red,
-                ),
-                _cardGenerator(
-                  icon: '🏆',
-                  label: 'BEST',
-                  valueAsString: '0',
-                  color: Colors.red,
-                ),
-              ]),
-            ),
-            Expanded(
-              flex: 2,
               child: Align(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.center,
                 child: GestureDetector(
                   onPanEnd: (details) {
                     final double vx = details.velocity.pixelsPerSecond.dx;
@@ -118,44 +118,28 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _displayCards([
-                    _cardGenerator(
-                      icon: '🥫',
-                      label: 'FOOD EATEN',
-                      valueAsString:
-                          gameState.eatenFoodLocations.length.toString(),
-                      color: Colors.greenAccent,
-                    ),
-                    _cardGenerator(
-                      icon: '☠️',
-                      label: 'POISONS',
-                      valueAsString:
-                          gameState.poisonLocations.length.toString(),
-                      color: Colors.deepPurple,
-                    ),
-                  ]),
-                  // Text(
-                  //   gameState.isGameOver ? belowInformationLine1 : '',
-                  //   style: TextStyle(
-                  //     color: Colors.yellow,
-                  //     fontFamily: 'ScoreLineFont',
-                  //     fontSize: 30,
-                  //   ),
-                  // ),
-                  // Text(
-                  //   gameState.isGameOver ? belowInformationLine2 : '',
-                  //   style: TextStyle(
-                  //     color: Colors.yellow,
-                  //     fontFamily: 'ScoreLineFont',
-                  //     fontSize: 30,
-                  //   ),
-                  // ),
-                ],
+            _displayCards([
+              _cardGenerator(
+                icon: '🥫',
+                label: 'FOOD EATEN',
+                valueAsString: gameState.eatenFoodLocations.length.toString(),
+                color: Colors.greenAccent,
+              ),
+              _cardGenerator(
+                icon: '☠️',
+                label: 'POISONS',
+                valueAsString: gameState.poisonLocations.length.toString(),
+                color: Colors.deepPurple,
+              ),
+            ]),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: Icon(
+                  _soundManager.mute ? Icons.volume_off : Icons.volume_up,
+                ),
+                color: Colors.white70,
+                onPressed: () => setState(() => _soundManager.toggleMute()),
               ),
             ),
           ],
@@ -163,6 +147,7 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
+  //TODO introduce a pause button
 
   Widget _displayCards(List<Widget> cards) {
     final List<Widget> rowChildren = [];
@@ -224,7 +209,6 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _startGame() {
-    _soundManager = SoundManager();
     _soundManager.init();
     setState(() {
       gameState = GameState.initial();
@@ -249,7 +233,7 @@ class _GameScreenState extends State<GameScreen> {
             //sound for lost game
             break;
           case GameEvent.atePoison:
-            //sound for eaten poison
+            _soundManager.playLifeLost();
             break;
           case GameEvent.none:
             break;

@@ -130,7 +130,7 @@ class GameState {
           );
         }
         pauseTicksRemaining =
-            15; //eaten poison - need to freeze, pause for 100ms x 15 = 1.5s
+            30; //eaten poison - need to freeze, pause for 100ms x 15 = 1.5s
 
         return GameState(
           //return 5 = landed on poison but lives left

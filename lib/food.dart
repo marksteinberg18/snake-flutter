@@ -27,6 +27,19 @@ class Food {
   static Food spawn(Snake snake, List<Cell> poisonLocations) {
     final occupied = snake.body.toSet();
     occupied.addAll(poisonLocations);
+    Cell head = snake.body.first; //e.g. [3,5]
+    switch (snake.direction) {
+      case Direction.up || Direction.down:
+        //add whole column to occupied, already occupied will not be added to as a set
+        for (int y = 0; y < gridSize; y++) {
+          occupied.add(Cell(head.x, y));
+        }
+      case Direction.left || Direction.right:
+        //add whole row to occupied, already occupied will not be added to as a set
+        for (int x = 0; x < gridSize; x++) {
+          occupied.add(Cell(x, head.y));
+        }
+    }
     Cell candidate;
     do {
       candidate = Cell(_random.nextInt(gridSize), _random.nextInt(gridSize));

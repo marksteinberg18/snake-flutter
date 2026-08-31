@@ -61,6 +61,7 @@ flutter:
   assets:
     - assets/sounds/success.wav
     - assets/sounds/poison.wav
+    - assets/sounds/lifelost.wav
   fonts:
     - family: ScoreLineFont
       fonts:
