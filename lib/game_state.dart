@@ -47,30 +47,16 @@ class GameState {
   }
 
   GameState tick() {
+    //1.Only continue if not in pause state - if so, decrement and return same game
     if (pauseTicksRemaining > 0) {
       pauseTicksRemaining--; //we're in a pause state - life lost, count down
       if (pauseTicksRemaining == 0) {
         //freeze JUST ended now
         Snake resetSnake = Snake.initial();
 
-        //check if poison or food is overlying the snake's initial position
-        List<Cell> poisonsClashingWithSnake =
-            poisonLocations
-                .where(((poison) => resetSnake.body.contains(poison)))
-                .toList();
-
-        if (poisonsClashingWithSnake.isNotEmpty) {
-          int numberPoisonsAffected = poisonsClashingWithSnake.length;
-          //need to delete these entries first
-          for (Cell poison in poisonsClashingWithSnake) {
-            poisonLocations.remove(poison);
-          }
-          //respawn THAT number of deleted poisons elsewhere on board
-          for (int i = 0; i < numberPoisonsAffected; i++) {
-            poisonLocations.add(_spawnPoison(resetSnake));
-          }
-        }
+        poisonClashingWithSnakeCheck(resetSnake);
         return GameState(
+          //return 1=end of pause, return reset board to snake.initial
           resetSnake,
           foodCell,
           eatenFoodLocations,
@@ -78,11 +64,12 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          GameEvent.atePoison,
+          GameEvent.none,
           pauseTicksRemaining,
         );
       }
       return GameState(
+        //return 2=pause continuing, return existing board
         snake,
         foodCell,
         eatenFoodLocations,
@@ -94,8 +81,8 @@ class GameState {
         pauseTicksRemaining,
       );
     }
-    ticksSinceMove++;
     Snake movedSnake = snake;
+    ticksSinceMove++;
     if (ticksSinceMove == 2) {
       //half speed
       //time for move
@@ -109,6 +96,7 @@ class GameState {
       if (selfCollision == true) {
         isGameOver = true;
         return GameState(
+          //return 3 = self collision
           snake,
           foodCell,
           eatenFoodLocations,
@@ -128,6 +116,7 @@ class GameState {
         if (lives == 0) {
           isGameOver = true;
           return GameState(
+            //return 4 = landed on poison and no lives left
             movedSnake,
             foodCell,
             eatenFoodLocations,
@@ -144,6 +133,7 @@ class GameState {
             15; //eaten poison - need to freeze, pause for 100ms x 15 = 1.5s
 
         return GameState(
+          //return 5 = landed on poison but lives left
           movedSnake,
           foodCell,
           eatenFoodLocations,
@@ -175,6 +165,7 @@ class GameState {
           poisonGenerated = true; //add new
         }
         return GameState(
+          //return 6 = spawn new food
           grownSnake,
           Food.spawn(grownSnake, poisonLocations),
           eatenFoodLocations,
@@ -182,9 +173,7 @@ class GameState {
           isGameOver,
           poisonLocations,
           lives,
-          poisonGenerated
-              ? GameEvent.poisonGenerated
-              : GameEvent.ateFood, //what happens with this line?
+          poisonGenerated ? GameEvent.poisonGenerated : GameEvent.ateFood,
           pauseTicksRemaining,
         );
       }
@@ -195,6 +184,7 @@ class GameState {
             .ageFood(); //this will create a new Food object with age+1, either yellow or red depending on the type
     if (agedFood.age > agedFood.type.maxAge) {
       return GameState(
+        //return 7 = old food has timed out & new one created
         movedSnake,
         Food.spawn(movedSnake, poisonLocations),
         eatenFoodLocations,
@@ -207,6 +197,7 @@ class GameState {
       );
     }
     return GameState(
+      //return 8 = nothing has changed other than moved snake
       movedSnake,
       agedFood,
       eatenFoodLocations,
@@ -217,6 +208,25 @@ class GameState {
       GameEvent.none,
       pauseTicksRemaining,
     );
+  }
+
+  void poisonClashingWithSnakeCheck(Snake resetSnake) {
+    List<Cell> poisonsClashingWithSnake =
+        poisonLocations
+            .where(((poison) => resetSnake.body.contains(poison)))
+            .toList();
+
+    if (poisonsClashingWithSnake.isNotEmpty) {
+      int numberPoisonsAffected = poisonsClashingWithSnake.length;
+      //need to delete these entries first
+      for (Cell poison in poisonsClashingWithSnake) {
+        poisonLocations.remove(poison);
+      }
+      //respawn THAT number of deleted poisons elsewhere on board
+      for (int i = 0; i < numberPoisonsAffected; i++) {
+        poisonLocations.add(_spawnPoison(resetSnake));
+      }
+    }
   }
 
   int ageOfFood() {
@@ -247,12 +257,12 @@ class GameState {
     switch (snake.direction) {
       case Direction.up || Direction.down:
         //add whole column to occupied, already occupied will not be added to as a set
-        for (int y = 0; y <= gridSize; y++) {
+        for (int y = 0; y < gridSize; y++) {
           occupied.add(Cell(head.x, y));
         }
       case Direction.left || Direction.right:
         //add whole row to occupied, already occupied will not be added to as a set
-        for (int x = 0; x <= gridSize; x++) {
+        for (int x = 0; x < gridSize; x++) {
           occupied.add(Cell(x, head.y));
         }
     }
