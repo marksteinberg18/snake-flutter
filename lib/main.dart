@@ -90,6 +90,7 @@ class _GameScreenState extends State<GameScreen> {
                 alignment: Alignment.center,
                 child: GestureDetector(
                   onPanEnd: (details) {
+                    if (gameState.gamePause) return;
                     final double vx = details.velocity.pixelsPerSecond.dx;
                     final double vy = details.velocity.pixelsPerSecond.dy;
                     if (vx.abs() > vy.abs()) {
@@ -132,15 +133,28 @@ class _GameScreenState extends State<GameScreen> {
                 color: Colors.deepPurple,
               ),
             ]),
-            Align(
-              alignment: Alignment.centerRight,
-              child: IconButton(
-                icon: Icon(
-                  _soundManager.mute ? Icons.volume_off : Icons.volume_up,
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    gameState.gamePause
+                        ? Icons.play_circle
+                        : Icons.pause_circle_filled,
+                  ),
+                  onPressed:
+                      () => setState(() {
+                        gameState.togglePause();
+                      }),
                 ),
-                color: Colors.white70,
-                onPressed: () => setState(() => _soundManager.toggleMute()),
-              ),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    _soundManager.mute ? Icons.volume_off : Icons.volume_up,
+                  ),
+                  color: Colors.white70,
+                  onPressed: () => setState(() => _soundManager.toggleMute()),
+                ),
+              ],
             ),
           ],
         ),
@@ -245,8 +259,3 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 }
-
-//TODO create a simple text box to show x,y of snake head
-//TODO create a simple text box to show x,y of food
-//TODO game over if snake head touches body
-//TODO in game_painter.dart add food alongside snake to draw rectangle

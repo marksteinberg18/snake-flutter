@@ -6,18 +6,19 @@ import 'dart:math';
 enum GameEvent { none, ateFood, atePoison, poisonGenerated, gameOver }
 
 class GameState {
-  final Snake snake;
-  final Food foodCell;
-  final List<Cell> eatenFoodLocations;
-  int ticksSinceMove;
-  static const moveInterval = 0.2; //7 x 100ms = 700ms
+  bool gamePause;
   bool isGameOver;
-  final List<Cell> poisonLocations;
-  static final Random _random = Random();
-  int lives;
+  final Food foodCell;
   final GameEvent lastEvent;
-  static const gridSize = Cell.gridSize;
+  final List<Cell> eatenFoodLocations;
+  final List<Cell> poisonLocations;
+  final Snake snake;
+  int lives;
   int pauseTicksRemaining;
+  int ticksSinceMove;
+  static const gridSize = Cell.gridSize;
+  static const moveInterval = 0.2; //7 x 100ms = 700ms
+  static final Random _random = Random();
 
   GameState(
     this.snake,
@@ -29,6 +30,7 @@ class GameState {
     this.lives,
     this.lastEvent,
     this.pauseTicksRemaining,
+    this.gamePause,
   );
 
   GameState.initial()
@@ -40,13 +42,29 @@ class GameState {
       foodCell = Food.spawn(Snake.initial(), []),
       lives = 3,
       lastEvent = GameEvent.none,
-      pauseTicksRemaining = 0;
+      pauseTicksRemaining = 0,
+      gamePause = false;
 
   int get score {
     return (snake.body.length - 3) * 100 * (1 + poisonLocations.length);
   }
 
   GameState tick() {
+    if (gamePause) {
+      //pause button is ON
+      return GameState(
+        snake,
+        foodCell,
+        eatenFoodLocations,
+        ticksSinceMove,
+        isGameOver,
+        poisonLocations,
+        lives,
+        GameEvent.none,
+        pauseTicksRemaining,
+        gamePause,
+      );
+    }
     //1.Only continue if not in pause state - if so, decrement and return same game
     if (pauseTicksRemaining > 0) {
       pauseTicksRemaining--; //we're in a pause state - life lost, count down
@@ -66,6 +84,7 @@ class GameState {
           lives,
           GameEvent.none,
           pauseTicksRemaining,
+          gamePause,
         );
       }
       return GameState(
@@ -79,6 +98,7 @@ class GameState {
         lives,
         GameEvent.none,
         pauseTicksRemaining,
+        gamePause,
       );
     }
     Snake movedSnake = snake;
@@ -106,6 +126,7 @@ class GameState {
           lives,
           GameEvent.gameOver,
           pauseTicksRemaining,
+          gamePause,
         );
       }
 
@@ -127,6 +148,7 @@ class GameState {
             GameEvent
                 .gameOver, //TODO gameOver should be divided to gameOverSelfCollision and gameOverLifesLost
             pauseTicksRemaining,
+            gamePause,
           );
         }
         pauseTicksRemaining =
@@ -143,6 +165,7 @@ class GameState {
           lives,
           GameEvent.atePoison,
           pauseTicksRemaining,
+          gamePause,
         );
       }
 
@@ -175,6 +198,7 @@ class GameState {
           lives,
           poisonGenerated ? GameEvent.poisonGenerated : GameEvent.ateFood,
           pauseTicksRemaining,
+          gamePause,
         );
       }
     }
@@ -194,6 +218,7 @@ class GameState {
         lives,
         GameEvent.none,
         pauseTicksRemaining,
+        gamePause,
       );
     }
     return GameState(
@@ -207,6 +232,7 @@ class GameState {
       lives,
       GameEvent.none,
       pauseTicksRemaining,
+      gamePause,
     );
   }
 
@@ -244,6 +270,7 @@ class GameState {
       lives,
       GameEvent.none,
       pauseTicksRemaining,
+      gamePause,
     );
   }
 
@@ -271,6 +298,12 @@ class GameState {
     do {
       newPoison = Cell(_random.nextInt(gridSize), _random.nextInt(gridSize));
     } while (occupied.contains(newPoison));
+
     return newPoison;
+  }
+
+  bool togglePause() {
+    gamePause = !gamePause;
+    return gamePause;
   }
 }
