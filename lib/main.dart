@@ -34,7 +34,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   late Timer _timer;
   final SoundManager _soundManager = SoundManager();
   String aboveInformationLine1 = 'Score: 0';
@@ -42,20 +42,51 @@ class _GameScreenState extends State<GameScreen> {
   String belowInformationLine1 = 'Tap Grid';
   String belowInformationLine2 = 'To Start Again';
   late GameState gameState;
+  bool _resumeOnReturn = false;
 
   //Snake snake = Snake.initial();
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); //listen for lifecycle events
     _soundManager.init(); //launch one time only
     _startGame();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer.cancel();
     _soundManager.disposeSounds();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      //game no longer on screen
+      gameState.gamePause = true; //pause game, we're away now
+      _resumeOnReturn = false; //we must not restart
+    }
+
+    if (state == AppLifecycleState.inactive) {
+      //if we're here AND isGamePlaying=T then notification shade, so promise to restart game
+      if (gameState.isGamePlaying) {
+        _resumeOnReturn = true; //promise to resume
+      }
+      gameState.gamePause = true; //pause the game for now
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      if (_resumeOnReturn) {
+        gameState.gamePause = false;
+        _resumeOnReturn = false;
+      }
+      //otherwise, keep game paused as it was a full Pause state - was paused in Inactive
+    }
+    print('App state: $state');
+    super.didChangeAppLifecycleState(state);
   }
 
   @override
@@ -147,6 +178,15 @@ class _GameScreenState extends State<GameScreen> {
                       }),
                 ),
                 Spacer(),
+                Text(
+                  gameState.gamePause ? 'PAUSED' : '',
+                  style: TextStyle(
+                    fontFamily: 'ScoreLineFont',
+                    fontSize: 28,
+                    color: Colors.green,
+                  ),
+                ),
+                Spacer(),
                 IconButton(
                   icon: Icon(
                     _soundManager.mute ? Icons.volume_off : Icons.volume_up,
@@ -161,7 +201,6 @@ class _GameScreenState extends State<GameScreen> {
       ),
     );
   }
-  //TODO introduce a pause button
 
   Widget _displayCards(List<Widget> cards) {
     final List<Widget> rowChildren = [];

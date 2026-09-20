@@ -306,4 +306,6 @@ class GameState {
     gamePause = !gamePause;
     return gamePause;
   }
+
+  bool get isGamePlaying => !gamePause;
 }
