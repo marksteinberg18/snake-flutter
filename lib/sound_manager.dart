@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SoundManager {
   // Claude's suggestion: one dedicated player per sound - created once and used multiple times
@@ -6,9 +7,11 @@ class SoundManager {
   final AudioPlayer _poisonPlayer = AudioPlayer();
   final AudioPlayer _lifelostPlayer = AudioPlayer();
   bool mute = false;
+  static const String _muteKey = 'mute';
 
-  toggleMute() {
+  bool toggleMute() {
     mute = !mute;
+    saveMute();
     return mute;
   }
 
@@ -71,5 +74,15 @@ class SoundManager {
     await _successPlayer.dispose();
     await _poisonPlayer.dispose();
     await _lifelostPlayer.dispose();
+  }
+
+  Future<void> saveMute() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_muteKey, mute);
+  }
+
+  Future<void> loadMute() async {
+    final prefs = await SharedPreferences.getInstance();
+    mute = prefs.getBool(_muteKey) ?? false;
   }
 }

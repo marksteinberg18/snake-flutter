@@ -54,6 +54,10 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this); //listen for lifecycle events
     _soundManager.init(); //launch one time only
     _loadBest(); //load best score
+    _soundManager.loadMute().then((_) {
+      if (!mounted) return;
+      setState(() {}); //update mute icon
+    }); //set mute preference
     _startGame();
   }
 
@@ -196,7 +200,11 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
                     _soundManager.mute ? Icons.volume_off : Icons.volume_up,
                   ),
                   color: Colors.white70,
-                  onPressed: () => setState(() => _soundManager.toggleMute()),
+                  onPressed: () {
+                    setState(() {
+                      _soundManager.toggleMute();
+                    });
+                  },
                 ),
               ],
             ),
