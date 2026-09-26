@@ -4,6 +4,7 @@ import 'snake.dart';
 import 'dart:async';
 import 'game_state.dart';
 import 'sound_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,6 +44,8 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
   String belowInformationLine2 = 'To Start Again';
   late GameState gameState;
   bool _resumeOnReturn = false;
+  int _bestScore = 0;
+  static const String _bestKey = 'bestScore';
 
   //Snake snake = Snake.initial();
   @override
@@ -50,6 +53,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this); //listen for lifecycle events
     _soundManager.init(); //launch one time only
+    _loadBest(); //load best score
     _startGame();
   }
 
@@ -112,7 +116,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
               _cardGenerator(
                 icon: '🏆',
                 label: 'BEST',
-                valueAsString: '0',
+                valueAsString: _bestScore.toString(),
                 color: Colors.red,
               ),
             ]),
@@ -283,6 +287,7 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
             _soundManager.playSuccessThenPoison();
             break;
           case GameEvent.gameOver:
+            _gameOver();
             //sound for lost game
             break;
           case GameEvent.atePoison:
@@ -291,10 +296,37 @@ class _GameScreenState extends State<GameScreen> with WidgetsBindingObserver {
           case GameEvent.none:
             break;
         }
-        if (gameState.isGameOver == true) {
-          _timer.cancel();
-        }
       });
     });
+  }
+
+  void _gameOver() {
+    //game over:
+    //1.cancel timer
+    _timer.cancel();
+    //2.display game over, tap to restart
+    //3.play game over sound
+    //4.deal with possible high score
+    if (gameState.score > _bestScore) {
+      //update screen
+      _bestScore = gameState.score;
+      //save high score
+      _saveBest();
+      //show 'well done message and fireworks or something
+    }
+  }
+
+  Future<void> _loadBest() async {
+    //load best score - comes from init and has to be a Future
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return; //no build context for setState
+    setState(() {
+      _bestScore = prefs.getInt(_bestKey) ?? 0;
+    });
+  }
+
+  Future<void> _saveBest() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_bestKey, _bestScore);
   }
 }
